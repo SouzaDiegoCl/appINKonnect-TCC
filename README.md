@@ -9,9 +9,16 @@
     - Chat integrado com inteligência artificial para criar tattos únicas com base no pedido do usuário;   
     - Opção de marcar uma sessão direto pelo aplicativo;
 
-## Exemplo - Execução do projeto:
-### Tela Inicial
-![Screenshot](/src/assets/images/ExampleImages/chooseUser.png)  
+## Exemplo - Execução do projeto:  
+### Tela inicial
+<img src='/src/assets/images/ExampleImages/chooseUser.png' width='200'></img>
+### Feed de Postagens
+<img src='/src/assets/images/ExampleImages/feedScreen.jpeg' width='200'></img>
+### Tela de Discover
+<img src='/src/assets/images/ExampleImages/discoverScreen.jpeg' width='200'></img>
+### Tela de Mapeamento
+<img src='/src/assets/images/ExampleImages/mapScreen.jpeg' width='200'></img>
+
   
 ## Guia para Testar e Executar o programa:
 
