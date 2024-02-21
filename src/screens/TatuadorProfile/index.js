@@ -17,37 +17,35 @@ import {
     Alert,
     Modal,
     TextInput,
+    FlatList,
+    Dimensions,
+    ImageBackground,
 
 } from 'react-native';
 import config from '../../../config'
 import { getUserData } from '../../components/userData';
-import Load from '../../components/Load';
 import { DrawerActions, useNavigation } from '@react-navigation/core';
 import api from '../../services/api';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
-
-
 import { useIsFocused } from '@react-navigation/native';
 import { KeyboardAvoidingView } from 'react-native';
+import Grid from '../../components/Grids/Postagens';
 
 export default function TatuadorProfile() {
 
     const navigation = useNavigation();
+    const [userData, setUserData] = useState(null);
 
+    /* const show Components */
+    const [showBtn, setShowBtn] = useState(false);
+    const [abrirModal, setAbrirModal] = useState(false);
+
+    /* Cadastrar estudio: */
     const [nomeEstudio, setNomeEstudio] = useState();
     const [endereco, setEndereco] = useState(null);
     const [nomeEndereco, setNomeEndereco] = useState(null);
     const [success, setSuccess] = useState(false);
-
-    const [showBtn, setShowBtn] = useState(false);
-
-
-
-    const [abrirModal, setAbrirModal] = useState(false);
-
-
-    /* Cadastrar etudio: */
     async function cadastrarEstudio() {
         if (nome = "") {
             Alert({
@@ -92,8 +90,7 @@ export default function TatuadorProfile() {
         }
     }
 
-    const [userData, setUserData] = useState(null);
-
+    /* Checar existencia de estudio */
     async function checkPerfil() {
         if (userData?.estudio == null) {
             console.log('Perfil não conectou a um estudio');
@@ -105,6 +102,58 @@ export default function TatuadorProfile() {
             setShowBtn(false)
         }
     }
+
+    /* Load Tatuador Posts */
+    const [lista, setLista] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [page, setPage] = useState(1);
+    async function loadData() {
+        try {
+            const user = await AsyncStorage.getItem('@user');
+
+            const response = await api.get(`InKonnectPHP/bd/tatuadores/postagensTatuador.php?ab=${userData.id}`);
+
+            if (lista.length >= response.data.totalItems) return;
+
+            if (loading === true) return;
+
+            setLoading(true);
+
+            setLista([...lista, ...response.data.resultado]);
+            setPage(page + 1);
+        } catch (error) {
+            console.log(error)
+        }
+    }
+    /* Header (user Info) */
+    const getHeader = () => {
+        return <View style={styles.userDataContainer}>            
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, }}>
+                <Entypo name="drop" size={24} color="white" style={{ marginLeft: -5, }} />
+                <Text style={styles.userDataText}>Nome: {userData?.nome}</Text>
+            </View>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, }}>
+                <AntDesign name="hearto" size={25} color="white" style={{ marginLeft: -5, }} />
+                <Text style={styles.userDataText}>Especialidade: {userData?.especialidade}</Text>
+            </View>
+
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, }}>
+                <MaterialCommunityIcons name="cake" size={24} color="white" style={{ marginLeft: -5, }} />
+                <Text style={styles.userDataText}>Nasceu: {userData?.dataNascimento} </Text>
+            </View>
+        </View>
+    };
+
+    /* Grid - User posts */
+    const renderItem = function ({ item }) {
+        return (
+            <Grid
+                data={item}
+            />
+        )
+    }
+
+    /* useEffect */
     useEffect(() => {
         const fetchUserData = async () => {
             const data = await getUserData();
@@ -114,20 +163,23 @@ export default function TatuadorProfile() {
         };
         fetchUserData();
         checkPerfil();
-    }, [userData]);
+        loadData();
+        console.log(userData?.imagem)
+    }, [userData, lista]);
 
+    
 
     return (
         <SafeAreaProvider style={styles.container}>
             <View style={styles.containerHeader}>
-                <View style={styles.headerBackground}>
-                    <TouchableOpacity
-                        style={styles.menu}
-                        onPress={() => navigation.push("Home")}
-                    >
-                        <Ionicons name="md-arrow-back-circle-outline" size={35} color="#000" style={styles.returnBtn} />
-                    </TouchableOpacity>
-                </View>
+                <ImageBackground source={require('../../assets/images/wallpaperProfileImage.png')} style={styles.imageBackground}>            
+                        <TouchableOpacity
+                            style={styles.menu}
+                            onPress={() => navigation.push("Home")}
+                        >
+                            <Ionicons name="md-arrow-back-circle-outline" size={35} color="#C6AC8F" style={styles.returnBtn} />
+                        </TouchableOpacity>
+                </ImageBackground>
                 <View style={styles.headerFooter}>
                     <Image style={styles.profilePicture} source={{
                         uri: url + "/InKonnectPHP/BD/tatuadores/imgsTatuadores" + "/" + userData?.imagem
@@ -137,18 +189,8 @@ export default function TatuadorProfile() {
                             {userData?.nome}
                         </Text>
                         {/* Se o tatuador tiver um studio linkado esse botão não aparece: */}
-                        {showBtn == true ?
-                            <>
-                                <TouchableOpacity
-                                    style={styles.HeaderBtnEstudio}
-                                    onPress={() => setAbrirModal(true)}
-                                >
-                                    <Text style={styles.HeaderBtnEstudioText}>Connectar Estúdio</Text>
-                                </TouchableOpacity>
-                            </>
-                            : null}
                     </View>
-                </View>
+                </View>                
             </View>
             <Modal
                 visible={abrirModal}
@@ -217,22 +259,28 @@ export default function TatuadorProfile() {
                 </View>
             </Modal>
             <View style={styles.mainConatiner}>
-                <View style={styles.userDataContainer}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, }}>
-                        <FontAwesome name="map-marker" size={24} color="white" />
-                        <Text style={styles.userDataText}>Cidade: Cajati</Text>
-                    </View>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, }}>
-                        <Entypo name="drop" size={24} color="white" style={{ marginLeft: -5, }} />
+                    {showBtn == true ?
+                        <>
+                            <TouchableOpacity
+                                style={styles.HeaderBtnEstudio}
+                                onPress={() => setAbrirModal(true)}
+                            >
+                                <Text style={styles.HeaderBtnEstudioText}>Conectar Estúdio</Text>
+                            </TouchableOpacity>
+                        </>
+                        : null}
+                <View style={styles.userDataContainer}>                   
+                    <View style={styles.containerLineItem}>
+                        <Entypo name="drop" size={25} color="white" style={{ marginLeft: -5, }} />
                         <Text style={styles.userDataText}>Nome: {userData?.nome}</Text>
                     </View>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, }}>
+                    <View style={styles.containerLineItem}>
                         <AntDesign name="hearto" size={25} color="white" style={{ marginLeft: -5, }} />
                         <Text style={styles.userDataText}>Especialidade: {userData?.especialidade}</Text>
                     </View>
 
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, }}>
-                        <MaterialCommunityIcons name="cake" size={24} color="white" style={{ marginLeft: -5, }} />
+                    <View style={styles.containerLineItem}>
+                        <MaterialCommunityIcons name="cake" size={25} color="white" style={{ marginLeft: -5, }} />
                         <Text style={styles.userDataText}>Nasceu: {userData?.dataNascimento} </Text>
                     </View>
                 </View>

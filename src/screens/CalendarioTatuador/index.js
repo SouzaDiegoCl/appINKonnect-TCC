@@ -12,11 +12,25 @@ import { getUserData } from "../../components/userData";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Calendar } from "react-native-calendars";
 import url from "../../services/url";
+
 export default function CalendarioTatuador() {
+
+    const [abrirCalendario, setAbrirCalendario] = useState(false);
 
     const navigation = useNavigation();
     const [dataSelected, setDataSelected] = useState();
-    const [dataSelectedTeste, setDataSelectedTeste] = useState('2023-07-19');
+
+    /* Testes Calendário */
+    const [dataSelectedTeste, setDataSelectedTeste] = useState(["2023-09-22", "2023-09-26"]);
+    const dataSelectedTestew = ["2023-09-26", "2023-09-24"];
+    let datasTestesObj = {}
+    dataSelectedTeste.forEach(
+        (item) => { datasTestesObj[item] = { selected: true } }
+    )
+
+
+    /* ------ */
+
     const [cliente, setCliente] = useState('');
     const [horario, setHorario] = useState('');
     const [valor, setValor] = useState('');
@@ -30,12 +44,9 @@ export default function CalendarioTatuador() {
         setShowPicker(true);
     };
 
-
-
     const handlePickerClose = () => {
         setShowPicker(false);
     };
-
 
     const handleDateChange = (event, date) => {
         if (date !== undefined) {
@@ -70,27 +81,48 @@ export default function CalendarioTatuador() {
         setMode(currentMode);
     }
 
-
-
-
     const [abrirModalHorario, setAbrirModalHorario] = useState(false);
     const [abrirModal, setAbrirModal] = useState(false);
     const [userData, setUserData] = useState(null);
-    useEffect(() => {
-        const fetchUserData = async () => {
-            const data = await getUserData();
-            setUserData(data);
-        };
-        fetchUserData();
-    }, []);
 
+    /*  async function addDataMarcada(d) {
+         const item = d;
+         console.log(item);
+         setDatasMarcadas([...datasMarcadas, item]);
+     }
+  */
 
-    const datasMarcadas = ['2023-07-27', '2023-07-20'];
-    async function addDataMarcada(d) {
-        const item = d;
-        console.log(item);
-        setDatasMarcadas([...datasMarcadas, item]);
+    let datasTestesObjDDFD = {}
+    async function marcarDatasCalendario() {
+        datasSessoes.forEach(
+            (item) => { datasTestesObjDDFD[item] = { selected: true } }
+        )
+        console.log("DATAAA");
+        console.log(datasTestesObjDDFD);
     }
+
+    const [datasSessoes, setDatasSessoes] = useState([]);
+    const fetchDatasMarcadas = async () => {
+        try {
+
+            const responseLista = await api.get(`InKonnectPHP/BD/tatuadores/listarDataSessoes.php?tatuador=${userData?.id}`);
+            console.log(responseLista.data.resultado);
+            responseLista.data.resultado.map((sessao, index) =>
+                /*                 setDatasSessoes(datasSessoes => [...datasSessoes, ...sessao.dataSessao]), */
+                datasSessoes.push(sessao.dataSessao),
+
+            )
+
+            console.log(datasSessoes)
+            marcarDatasCalendario();
+            console.log(datasTestesObjDDFD);
+            console.log(Object.keys(datasTestesObjDDFD).length);
+        }
+        catch (error) {
+            console.log("Erro ao carregar os dados", error);
+        }
+    }
+
 
     async function cadastrarSessao() {
         if (cliente == "" || valor == "" || horario == "") {
@@ -127,6 +159,7 @@ export default function CalendarioTatuador() {
                 console.log("Acho que deu!");
                 setAbrirModal(!abrirModal);
                 navigation.push("Home")
+
             }
         }
     }
@@ -162,46 +195,102 @@ export default function CalendarioTatuador() {
             />
         )
     }
-    useEffect(() => {
-        loadData();
-    }, [page, totalItems, lista]);
 
+
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            const data = await getUserData();
+            setUserData(data);
+        };
+        fetchUserData();
+        setDatasSessoes([]);
+        loadData();
+        fetchDatasMarcadas();
+    }, [lista, abrirCalendario]);
 
     const getHeader = () => {
 
         return <>
             <Header />
+            {/* {listaSessoes.length > 0 ?
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scrollFilters}>
+                    {
+                        listaSessoes.map((story, index) => (
+                            <TouchableOpacity
+                                style={styles.storyContainer}>
+                                <Text style={styles.storyText}>{story.dataSessao}</Text>
+                            </TouchableOpacity>
+
+
+                        ))
+                    }
+                </ScrollView>
+                :
+                <View></View>
+            } */}
             <View style={{ paddingBottom: 25, borderBottomWidth: 3, borderBottomColor: '#413B33', }}>
-                <Calendar
-                    style={{ borderRadius: 20, borderWidth: 1, height: 400, marginHorizontal: 25, marginTop: 15 }}
-                    onDayPress={day => {
-                        setDataSelected(day.dateString);
-                        console.log(day.dateString);
-                        setAbrirModal(true);
-                    }}
-                    markedDates={{
-                        [dataSelected]: { marked: true, selectedDotColor: 'orange', selected: true },
-                        [dataSelectedTeste]: { marked: true, selectedDotColor: 'orange', selected: true },
-                        [datasMarcadas]: { marked: true, selectedDotColor: 'orange', selected: true },
-                    }}
-                    theme={{
-                        calendarBackground: '#222',
-                        dayTextColor: '#fff',
-                        textDisabledColor: '#444',
-                        monthTextColor: '#888'
-                    }}
-                />
+                <TouchableOpacity
+                    style={styles.botaoAbrirCalendario}
+                    onPress={() => {
+                        console.log(datasTestesObjDDFD)
+                        console.log("aaaaaaaaaaaaaaaaaaaaaaaa")
+                        console.log(datasSessoes)
+                        fetchDatasMarcadas()
+                        setAbrirCalendario(true)
+
+                        console.log(datasTestesObjDDFD)
+                    }
+                    }
+                >
+                    <Text style={{color:'#C6AC8F', fontSize:18, fontWeight:'700'}}>Visualizar Calendário</Text>
+                </TouchableOpacity>
+
+
+
+                {abrirCalendario ?
+                    <View style={styles.containerCalendario}>
+                        <TouchableOpacity
+                            style={styles.removeItem}
+                            onPress={() => setAbrirCalendario(false)}
+                        >
+                            <EvilIcons name="close" size={25} color="black" />
+                        </TouchableOpacity>
+                        <Calendar
+                            style={styles.calendarStyle}
+                            onDayPress={day => {
+                                setDataSelected(day.dateString);
+                                console.log(day.dateString);
+                                setAbrirModal(true);
+                            }}
+                            markedDates={datasTestesObjDDFD}
+                            /* markedDates={{
+                                [datasTestesObj]: { marked: true, selectedDotColor: 'orange', selected: true },
+                                [dataSelected]: { marked: true, selectedDotColor: 'orange', selected: true },
+                                [dataSelectedTeste]: { marked: true, selectedDotColor: 'orange', selected: true },
+                    
+                            }} */
+                            theme={{
+                                calendarBackground: '#222',
+                                dayTextColor: '#fff',
+                                textDisabledColor: '#444',
+                                monthTextColor: '#888'
+                            }}
+                        />
+                    </View>
+                    : <></>
+                }
+
             </View>
         </>
     };
-    const getFooter = () => {
-        return <Text>'Loading...'</Text>;
-    };
+
 
 
     return (
         <View style={styles.container}>
-            <View style={{ backgroundColor: '#121212', paddingHorizontal: 15, flex: 1, }}>
+
+            <View style={{ backgroundColor: '#121212', flex: 1, }}>
                 <View style={{ flex: 1, }}>
                     <FlatList
                         data={lista}
@@ -209,8 +298,8 @@ export default function CalendarioTatuador() {
                         ListHeaderComponent={getHeader}/* Usa isso para não precisar colocar flatlist dentro da scrollview */
                     />
                 </View>
-            </View>
 
+            </View>
 
 
             <Modal
@@ -319,6 +408,7 @@ export default function CalendarioTatuador() {
                     </View>
                 </View>
             </Modal>
+
         </View >
     )
 }

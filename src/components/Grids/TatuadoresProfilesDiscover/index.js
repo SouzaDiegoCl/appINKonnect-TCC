@@ -72,7 +72,7 @@ CardUsuarios = ({ data } = DadosProps) => {
     }
 
     async function Search() {
-        const response = await api.get(`InKonnectPHP/bd/usuarios/buscar.php?buscar=${busca}`);
+    const response = await api.get(`InKonnectPHP/bd/usuarios/buscar.php?buscar=${busca}`)   ;
         setLista(response.data.resultado);
     }
 
@@ -155,7 +155,7 @@ CardUsuarios = ({ data } = DadosProps) => {
                             <View style={styles.containerButtonFollow}>
                                 <TouchableOpacity
                                     style={styles.buttonFollow}
-                                    /* onPress={'...'} */
+                                /* onPress={'...'} */
                                 >
                                     <Ionicons name="add-outline" size={20} color="#fff" />
                                 </TouchableOpacity>

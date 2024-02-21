@@ -6,9 +6,41 @@ export const styles = StyleSheet.create({
     container: {
         backgroundColor: '#121212',
         flex: 1,
+        padding: 10,
     },
 
-
+    botaoAbrirCalendario: {
+        backgroundColor: '#1B292f',
+        padding: 10,
+        borderRadius: 5,
+        alignItems: 'center',
+        width: 250,
+        alignSelf: 'center',
+        marginTop: 20,
+    },
+    containerCalendario: {
+        padding: 5,
+        backgroundColor: '#1B292f',
+        marginTop: 20,
+        borderRadius: 20
+    },
+    removeItem: {
+        marginTop: 10,
+        marginLeft: 5
+    },
+    calendarStyle: {
+        borderRadius: 20,
+        borderWidth: 1,
+        height: 400,
+        marginHorizontal: 25,
+        marginTop: 25, marginBottom: 20
+    },
+    btnFecharContainerCalendario: {
+        justifyContent: "flex-end",
+        alignItems: "flex-end",
+        marginRight: 10,
+        marginTop: 15,
+    },
     /* Modal */
     ModalTitle: {
         fontFamily: fonts.text,

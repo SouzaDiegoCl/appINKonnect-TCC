@@ -31,7 +31,6 @@ export default function Home() {
         fetchUserData();
     }, []);
 
-
     async function loadData() {
         try {
             const response = await api.get(`InKonnectPHP/bd/tatuadores/listarPostagens.php?pagina=${page}&limite=10`);
@@ -49,7 +48,6 @@ export default function Home() {
         }
     }
 
-
     const renderItem = function ({ item }) {
         return (
             <Grid
@@ -58,7 +56,7 @@ export default function Home() {
         )
     }
 
-    function Footer() {
+   /*  function Footer() {
         if (!load) return null;
 
         return (
@@ -66,7 +64,7 @@ export default function Home() {
                 <ActivityIndicator size={25} color="#000" />
             </View>
         )
-    }
+    } */
 
     async function Search() {
         const response = await api.get(`InKonnectPHP/bd/usuarios/buscar.php?buscar=${busca}`);
@@ -106,7 +104,7 @@ export default function Home() {
                 <Ionicons name="add" size={35} color="#C6AC8F" />
             </TouchableOpacity>
 
-            <View style={{ backgroundColor: '#121212', paddingHorizontal: 15, flex: 1, }}>                
+            <View style={{ backgroundColor: '#121212', paddingHorizontal: 15, flex: 1, }}>
                 <View style={{ flex: 1, height: Dimensions.get('window').height + 30, }}>
                     <FlatList
                         data={lista}
