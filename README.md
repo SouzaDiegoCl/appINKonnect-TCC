@@ -8,6 +8,10 @@
     - Sistema de mapeamento baseado na localização em tempo real;
     - Chat integrado com inteligência artificial para criar tattos únicas com base no pedido do usuário;   
     - Opção de marcar uma sessão direto pelo aplicativo;
+
+## Exemplo - Execução do projeto:
+### Tela Inicial
+![Screenshot](/src/assets/images/ExampleImages/chooseUser.png)  
   
 ## Guia para Testar e Executar o programa:
 
