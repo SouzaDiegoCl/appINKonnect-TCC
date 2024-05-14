@@ -9,6 +9,12 @@
     - Chat integrado com inteligência artificial para criar tattos únicas com base no pedido do usuário;   
     - Opção de marcar uma sessão direto pelo aplicativo;
 
+### Principais Tecnologias Utilizadas:
+      - JAVASCRIPT
+      - REACT NATIVE
+      - PHP
+      
+
 ## Exemplo - Execução do projeto:  
 ### Tela inicial
 <img src='/src/assets/images/ExampleImages/chooseUser.png' width='200'></img>
